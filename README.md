@@ -1,6 +1,8 @@
 # Gnome-Software-Snap-RHEL
 Make snap into gnome-software on RHEL
 
+<img width="1728" height="1080" alt="473796292-93fe3577-03be-440c-83f5-7c865c01743d" src="https://github.com/user-attachments/assets/c9594590-7bbc-4b31-971b-536356a4ff7b" />
+
 # Support
 - aarch64 → arm64
 - x86_64 → x64 (Required x86-64-v3 and above)
