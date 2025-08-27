@@ -3,7 +3,7 @@ Make snap into gnome-software on RHEL
 
 ![473796292-93fe3577-03be-440c-83f5-7c865c01743](https://github.com/user-attachments/assets/fd42d8a5-19be-4a02-9d1e-4b0bab742acb)
 
-# Support
+# Branch
 - aarch64 → arm64
 - x86_64 → x64 (Required x86-64-v3 and above)
 - x86_64_v2 → x64 (Support x86-64-v2)
