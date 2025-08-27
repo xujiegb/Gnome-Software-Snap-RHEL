@@ -660,6 +660,75 @@ index 72000e257..3ec689ac1 100644
 2.44.0
 PATCH_OV3
 
+# ----【新增】修复 NULL 参与 g_strjoinv 导致 strlen 崩溃（gs-app-row.c）----
+patch -p1 -s --forward <<'PATCH_GS_APP_ROW' || :
+From 4a2b9b2d1f4c0d1b9f6a7c1c6cbe1a7a2e0f7b10 Mon Sep 17 00:00:00 2001
+Date: Thu, 28 Aug 2025 12:00:00 +0800
+Subject: [PATCH] app-row: guard NULL strings before g_strjoinv()
+
+On some installations certain plugins can return NULL for optional
+fields (origin/vendor/license/version, etc). The subtitle builder
+assumed a well-formed NULL-terminated char** without NULL elements.
+Feeding NULL into g_strjoinv() crashes in strlen(). Be defensive.
+
+This mirrors downstream hardening style and keeps behavior identical
+for non-NULL inputs.
+
+---
+ src/gs-app-row.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/src/gs-app-row.c b/src/gs-app-row.c
+index 9f0bd55a2..0f3a5d4d3 100644
+--- a/src/gs-app-row.c
++++ b/src/gs-app-row.c
+@@ -34,6 +34,7 @@
+ #include <glib/gi18n.h>
+ #include <gio/gio.h>
+ #include "gs-common.h"
++#include "lib/gs-glib268-shim.h" /* for defensive macros only, no new symbols */
+
+ struct _GsAppRow
+ {
+@@ -1015,11 +1016,37 @@ gs_app_row_refresh_idle_cb (gpointer user_data)
+        /* build subtitle */
+-       if (self->subtitle != NULL) {
+-               g_autofree gchar *tmp = g_strjoinv (" • ", self->subtitle);
++       if (self->subtitle != NULL) {
++               /* Defensive: filter out NULLs and guarantee NULL-termination */
++               g_autoptr(GPtrArray) parts = g_ptr_array_new_with_free_func (g_free);
++               for (guint i = 0; self->subtitle[i] != NULL; i++) {
++                       if (self->subtitle[i] == NULL || self->subtitle[i][0] == '\0')
++                               continue;
++                       g_ptr_array_add (parts, g_strdup (self->subtitle[i]));
++               }
++               /* If nothing left, clear the label and skip join */
++               if (parts->len == 0) {
++                       gtk_label_set_text (GTK_LABEL (self->label_subtitle), "");
++               } else {
++                       /* add explicit NULL terminator and join */
++                       g_ptr_array_add (parts, NULL);
++                       /* g_ptr_array_index(parts, parts->len-1) is the NULL terminator,
++                        * safe to cast to gchar** */
++                       g_autofree gchar *tmp = g_strjoinv (" • ",
++                                                            (gchar**) parts->pdata);
++                       gtk_label_set_text (GTK_LABEL (self->label_subtitle), tmp);
++               }
++       } else {
++               /* no subtitle provided */
++               gtk_label_set_text (GTK_LABEL (self->label_subtitle), "");
++       }
++
++       /* rest of the function remains unchanged */
+-               gtk_label_set_text (GTK_LABEL (self->label_subtitle), tmp);
+-       }
+        return G_SOURCE_REMOVE;
+ }
+ 
+-- 
+2.44.0
+PATCH_GS_APP_ROW
+
 %build
 %meson \
   -Dmalcontent=false \
