@@ -1,4 +1,4 @@
-# Gnome-Software-Snap-RPM
+# Gnome-Software-Snap-RHEL
 Make snap into gnome-software on RHEL
 
 # Support
