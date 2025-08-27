@@ -1,7 +1,7 @@
 # Gnome-Software-Snap-RHEL
 Make snap into gnome-software on RHEL
 
-![473796292-93fe3577-03be-440c-83f5-7c865c01743d](https://github.com/user-attachments/assets/c737b5f3-658c-45bf-814b-cfdbd2e120ad)
+![473796292-93fe3577-03be-440c-83f5-7c865c01743](https://github.com/user-attachments/assets/fd42d8a5-19be-4a02-9d1e-4b0bab742acb)
 
 # Support
 - aarch64 → arm64
