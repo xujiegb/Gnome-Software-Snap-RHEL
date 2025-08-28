@@ -248,7 +248,6 @@ def ensure_include(path, header_rel):
         s = f.read()
     if 'gs-glib268-shim.h' in s:
         return
-    # 优先插到 <gio/gio.h> 之后；否则放到第一条 #include 之后
     s2 = re.sub(r'(#include\s*[<"]gio/gio\.h[>"].*\n)',
                 r'\1#include "%s"\n' % header_rel,
                 s, count=1, flags=re.M)
@@ -259,17 +258,15 @@ def ensure_include(path, header_rel):
     with io.open(path,'w',encoding='utf-8') as f:
         f.write(s2)
 
-# lib/ 里的源文件
 for fn in [
-    'lib/gs-plugin-loader.c',       # g_prefix_error_literal / g_thread_pool_new_full
-    'lib/gs-app-query.c',           # g_strv_builder_addv
-    'lib/gs-fedora-third-party.c',  # g_spawn_check_wait_status
-    'lib/gs-icon-downloader.c',     # G_DEFINE_FINAL_TYPE
-    'lib/gs-job-manager.c',         # g_source_set_static_name
+    'lib/gs-plugin-loader.c',
+    'lib/gs-app-query.c',
+    'lib/gs-fedora-third-party.c',
+    'lib/gs-icon-downloader.c',
+    'lib/gs-job-manager.c',
 ]:
     ensure_include(fn, 'gs-glib268-shim.h')
 
-# 插件里也加 shim 头（相对路径指向 lib/）
 for fn in [
     'plugins/fwupd/gs-plugin-fwupd.c',
     'plugins/flatpak/gs-flatpak.c',
@@ -277,25 +274,21 @@ for fn in [
 ]:
     ensure_include(fn, 'lib/gs-glib268-shim.h')
 
-# src/ 中用到 shim 的源
 for fn in [
-    'src/gs-app-row.c',     # g_ptr_array_new_null_terminated
-    'src/gs-common.c',      # PangoAttrList autoptr + g_prefix_error_literal
+    'src/gs-app-row.c',
+    'src/gs-common.c',
 ]:
     ensure_include(fn, 'lib/gs-glib268-shim.h')
 
-# ---- 修复 src/gs-update-monitor.c 对不存在成员的访问（GLib<2.70）----
 up_mon = 'src/gs-update-monitor.c'
 ensure_include(up_mon, 'lib/gs-glib268-shim.h')
 
 with io.open(up_mon,'r',encoding='utf-8') as f:
     t = f.read()
 
-# 撤销之前可能插入的守卫（避免把函数体夹坏）
 t = t.replace('#if GLIB_CHECK_VERSION(2,70,0)\n', '')
 t = t.replace('#endif /* GLib >= 2.70 */\n', '')
 
-# 只改“} else if (monitor->power_profile_monitor == NULL) {”
 pat = r'\}\s*else\s+if\s*\(\s*monitor->power_profile_monitor\s*==\s*NULL\s*\)\s*\{'
 rep = ('}\n'
        '#if GLIB_CHECK_VERSION(2,70,0)\n'
@@ -316,23 +309,10 @@ print('shim includes done, pango autoptr provided, and gs-update-monitor guarded
 PY
 
 # ----【新增】借鉴红帽：Overview 类目健壮性补丁（三连）----
-# 说明：
-# 1/3：lib/gs-appstream.c 中把类目计数抓取上限从 10 调整为 100，并去掉一次过早的 continue
-# 2/3：src/gs-overview-page.c 增加调试日志，便于定位类目计数来源
-# 3/3：src/gs-overview-page.c 校验各类目的真实内容，修正不准确的 size（避免后续页面逻辑对 0/过大值崩溃）
-# 使用 --forward，若已应用则跳过；若上游差异较大，构建日志会提示具体失败的 hunk，便于针对性微调。
 patch -p1 -s --forward <<'PATCH_OV1' || :
 From f7e394840ff84ae8b55f13ff9692d6b02e8e6ea5 Mon Sep 17 00:00:00 2001
 Date: Wed, 20 Dec 2023 12:21:24 +0100
 Subject: [PATCH 1/3] gs-appstream: Increase limit to category apps lookup
-
-The Overview page currently checks for 100 apps in all categories.
-Lookup for the same count per category.
-
-Note: The counts are not accurate, same apps can be in multiple
-sub-categories, thus the parent category count suffers of duplicity,
-which the following commit will correct in a different way than
-checking for id duplicity.
 ---
  lib/gs-appstream.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -368,8 +348,6 @@ From 617af44a56f6f62e07fd3fc13ae43d688aa3b85f Mon Sep 17 00:00:00 2001
 Date: Wed, 20 Dec 2023 12:24:25 +0100
 Subject: [PATCH 2/3] gs-overview-page: Add debug prints about discovered
  categories
-
-For easier debugging, to see what the plugins returned.
 ---
  src/gs-overview-page.c | 2 ++
  1 file changed, 2 insertions(+)
@@ -402,11 +380,6 @@ patch -p1 -s --forward <<'PATCH_OV3' || :
 From 98086eca23dbd46284039722887852e8c760a0fe Mon Sep 17 00:00:00 2001
 Date: Wed, 20 Dec 2023 12:32:21 +0100
 Subject: [PATCH 3/3] gs-overview-page: Verify category sizes
-
-The "list-categories" job can set inaccurate sizes for the categories,
-thus check the actual category content to operate with proper numbers.
-For example the appstream data can have information about apps, which
-no plugin can provide due to disabled repository.
 ---
  src/gs-overview-page.c | 176 +++++++++++++++++++++++++++++++++++------
  1 file changed, 153 insertions(+), 23 deletions(-)
@@ -478,7 +451,7 @@ index 72000e257..3ec689ac1 100644
  	gtk_widget_set_visible (self->iconless_categories_heading,
  				gtk_flow_box_get_child_at_index (GTK_FLOW_BOX (self->flowbox_iconless_categories), 0) != NULL);
 @@ -525,6 +512,27 @@ out:
- 	 * See https://gitlab.gnome.org/GNOME/gnome-software/-/issues/2053 */
+ 	 * See https://gitlab.gnome.org/GNOME/gnOME/gnome-software/-/issues/2053 */
  	gtk_widget_set_visible (self->flowbox_categories, found_apps_cnt >= MIN_CATEGORIES_APPS);
  
 +	return found_apps_cnt;
@@ -494,7 +467,6 @@ index 72000e257..3ec689ac1 100644
 +
 +	data->n_pending_ops--;
 +	if (data->n_pending_ops > 0) {
-+		/* to not be freed */
 +		g_steal_pointer (&data);
 +		return;
 +	}
@@ -580,8 +552,6 @@ index 72000e257..3ec689ac1 100644
 +
 +	data->n_pending_ops++;
 +
-+	/* The apps can be mentioned in the appstream data, but no plugin may provide actual app,
-+	   thus try to get the content as the Categories page and fine tune the numbers appropriately. */
 +	if (!gs_plugin_loader_job_action_finish (plugin_loader, res, &error)) {
 +		if (!g_error_matches (error, GS_PLUGIN_ERROR, GS_PLUGIN_ERROR_CANCELLED) &&
 +		    !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
@@ -665,15 +635,6 @@ patch -p1 -s --forward <<'PATCH_GS_APP_ROW' || :
 From 4a2b9b2d1f4c0d1b9f6a7c1c6cbe1a7a2e0f7b10 Mon Sep 17 00:00:00 2001
 Date: Thu, 28 Aug 2025 12:00:00 +0800
 Subject: [PATCH] app-row: guard NULL strings before g_strjoinv()
-
-On some installations certain plugins can return NULL for optional
-fields (origin/vendor/license/version, etc). The subtitle builder
-assumed a well-formed NULL-terminated char** without NULL elements.
-Feeding NULL into g_strjoinv() crashes in strlen(). Be defensive.
-
-This mirrors downstream hardening style and keeps behavior identical
-for non-NULL inputs.
-
 ---
  src/gs-app-row.c | 31 +++++++++++++++++++++++++++++--
  1 file changed, 29 insertions(+), 2 deletions(-)
@@ -687,7 +648,7 @@ index 9f0bd55a2..0f3a5d4d3 100644
  #include <gio/gio.h>
  #include "gs-common.h"
 +#include "lib/gs-glib268-shim.h" /* for defensive macros only, no new symbols */
-
+ 
  struct _GsAppRow
  {
 @@ -1015,11 +1016,37 @@ gs_app_row_refresh_idle_cb (gpointer user_data)
@@ -695,31 +656,23 @@ index 9f0bd55a2..0f3a5d4d3 100644
 -       if (self->subtitle != NULL) {
 -               g_autofree gchar *tmp = g_strjoinv (" • ", self->subtitle);
 +       if (self->subtitle != NULL) {
-+               /* Defensive: filter out NULLs and guarantee NULL-termination */
 +               g_autoptr(GPtrArray) parts = g_ptr_array_new_with_free_func (g_free);
 +               for (guint i = 0; self->subtitle[i] != NULL; i++) {
 +                       if (self->subtitle[i] == NULL || self->subtitle[i][0] == '\0')
 +                               continue;
 +                       g_ptr_array_add (parts, g_strdup (self->subtitle[i]));
 +               }
-+               /* If nothing left, clear the label and skip join */
 +               if (parts->len == 0) {
 +                       gtk_label_set_text (GTK_LABEL (self->label_subtitle), "");
 +               } else {
-+                       /* add explicit NULL terminator and join */
 +                       g_ptr_array_add (parts, NULL);
-+                       /* g_ptr_array_index(parts, parts->len-1) is the NULL terminator,
-+                        * safe to cast to gchar** */
 +                       g_autofree gchar *tmp = g_strjoinv (" • ",
 +                                                            (gchar**) parts->pdata);
 +                       gtk_label_set_text (GTK_LABEL (self->label_subtitle), tmp);
 +               }
 +       } else {
-+               /* no subtitle provided */
 +               gtk_label_set_text (GTK_LABEL (self->label_subtitle), "");
-+       }
-+
-+       /* rest of the function remains unchanged */
+        }
 -               gtk_label_set_text (GTK_LABEL (self->label_subtitle), tmp);
 -       }
         return G_SOURCE_REMOVE;
