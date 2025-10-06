@@ -1,5 +1,5 @@
 # Gnome-Software-Snap-RHEL
-Make snap into gnome-software on RHEL
+Make snap into gnome-software on RHEL\
 在 RHEL 的 gnome-software 添加 snap 支持
 
 ![473796292-93fe3577-03be-440c-83f5-7c865c01743](https://github.com/user-attachments/assets/fd42d8a5-19be-4a02-9d1e-4b0bab742acb)
