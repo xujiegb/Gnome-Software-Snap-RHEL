@@ -41,7 +41,7 @@ sudo ln -s /var/lib/snapd/snap /snap
 ---
 
 ### 3. Install GNOME Software and language packs
-安装 GNOME Softwareand language packs
+安装 GNOME Software and language packs
 ```bash
 sudo dnf install gnome-software gnome-software-fedora-langpacks
 ```
