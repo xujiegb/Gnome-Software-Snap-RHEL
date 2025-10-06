@@ -11,14 +11,17 @@ Make snap into gnome-software on RHEL
 # Setup
 
 ### 1. Install EPEL
+安装 EPEL
 
 **If your system is Red Hat Enterprise Linux**
+如果你的系统是 红帽企业Linux
 ```bash
 subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms && \
 dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 ```
 
 **If your system is CentOS Stream / Rocky Linux / AlmaLinux**
+如果你的系统是 CentOS Stream / Rocky Linux / AlmaLinux
 ```bash
 dnf config-manager --set-enabled crb && \
 dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
@@ -27,6 +30,7 @@ dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.
 ---
 
 ### 2. Install Snapd
+安装 Snapd
 ```bash
 sudo yum install snapd
 sudo systemctl enable --now snapd.socket
@@ -36,6 +40,7 @@ sudo ln -s /var/lib/snapd/snap /snap
 ---
 
 ### 3. Install GNOME Software and language packs
+安装 GNOME Softwareand language packs
 ```bash
 sudo dnf install gnome-software gnome-software-fedora-langpacks
 ```
