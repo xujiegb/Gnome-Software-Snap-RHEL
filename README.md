@@ -56,8 +56,17 @@ flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.f
 
 ---
 
-### 5. Reboot Linux
+### 5. Update Linux
+更新 Linux 系統
+```bash
+sudo yum update -y
+```
+
+---
+
+### 6. Reboot Linux
 重啓 Linux 系統
 ```bash
 reboot
 ```
+
