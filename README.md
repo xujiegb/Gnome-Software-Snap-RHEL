@@ -53,3 +53,11 @@ sudo dnf install gnome-software gnome-software-fedora-langpacks
 ```bash
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 ```
+
+---
+
+### 5. Reboot Linux
+重啓 Linux 系統
+```bash
+reboot
+```
