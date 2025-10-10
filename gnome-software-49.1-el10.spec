@@ -254,7 +254,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/gtk-doc/html/gnome-software/*
 
 %changelog
-* Mon Oct 11 2025 Jie Xu <xujie@redhat.com> - 49.1-1
+* Sat Oct 11 2025 Jie Xu <xujie@redhat.com> - 49.1-1
 - Enable Snap plugin
 
 * Wed Jan 15 2025 Milan Crha <mcrha@redhat.com> - 47.4-1
