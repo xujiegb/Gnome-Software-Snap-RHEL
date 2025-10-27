@@ -66,16 +66,6 @@ body:
     validations:
       required: true
 
-  - type: attachments
-    id: "screenshots"
-    attributes:
-      label: "截图"
-      description: "请上传能体现问题的截图（必须是图片文件）"
-      accept:
-        - image/*
-    validations:
-      required: true
-
   - type: textarea
     id: "more"
     attributes:
@@ -83,6 +73,16 @@ body:
       description: "可选"
     validations:
       required: false
+
+  - type: attachments
+    id: "screenshots"
+    attributes:
+      label: "截图"
+      description: "请上传能体现问题的截图（必须为图片文件，无水印）"
+      accept:
+        - image/*
+    validations:
+      required: true
 
   - type: checkboxes
     id: "latest-version"
