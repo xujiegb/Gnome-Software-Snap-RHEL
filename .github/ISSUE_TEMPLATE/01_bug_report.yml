@@ -66,6 +66,16 @@ body:
     validations:
       required: true
 
+  - type: attachments
+    id: "screenshots"
+    attributes:
+      label: "截图"
+      description: "请上传能体现问题的截图（必须是图片文件）"
+      accept:
+        - image/*
+    validations:
+      required: true
+
   - type: textarea
     id: "more"
     attributes:
