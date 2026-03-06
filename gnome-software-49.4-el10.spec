@@ -27,7 +27,7 @@
 %global __provides_exclude_from ^%{_libdir}/%{name}/plugins-%{gs_plugin_version}/.*\\.so.*$
 
 Name:      gnome-software
-Version:   49.4
+Version:   49.3
 Release:   1%{?dist}
 Summary:   A software center for GNOME
 
@@ -36,8 +36,8 @@ URL:       https://apps.gnome.org/Software
 Source0:   https://download.gnome.org/sources/gnome-software/49/%{name}-%{tarball_version}.tar.xz
 Source1:   org.gnome.App-list-1.0.xml
 
-Patch:     0001-Disable-build-and-use-of-help-files.patch
-Patch:     0001-crash-under-gs_appstream_gather_merge_data.patch
+# Patch:     0001-Disable-build-and-use-of-help-files.patch
+# Patch:     0001-crash-under-gs_appstream_gather_merge_data.patch
 
 # ostree and flatpak not on i686 for Fedora and RHEL 10
 # https://github.com/containers/composefs/pull/229#issuecomment-1838735764
@@ -152,11 +152,10 @@ This package includes the rpm-ostree backend.
 %endif
 
 %prep
-%autosetup -p1 -S gendiff -n %{name}-%{tarball_version}
+%autosetup -n %{name}-%{tarball_version}
 
 %build
 %meson \
-    -Dsoup2=false \
 %if %{with snap}
     -Dsnap=true \
 %else
@@ -284,7 +283,6 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %if %{with snap}
 %{_libdir}/gnome-software/plugins-%{gs_plugin_version}/libgs_plugin_snap.so
 %endif
-%{_sysconfdir}/xdg/autostart/org.gnome.Software.desktop
 %dir %{_datadir}/swcatalog
 %dir %{_datadir}/swcatalog/xml
 %if %{with webapps}
@@ -300,6 +298,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/glib-2.0/schemas/org.gnome.software-fedora.gschema.override
 %{_libexecdir}/gnome-software-cmd
 %{_libexecdir}/gnome-software-restarter
+%{_userunitdir}/gnome-software.service
 
 %if %{with dkms}
 %{_datadir}/polkit-1/actions/org.gnome.software.dkms-helper.policy
@@ -325,7 +324,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/gtk-doc/html/gnome-software/
 
 %changelog
-* Fri Mar 07 2026 Jie Xu <xujie@redhat.com> - 49.4-1
+* Fri Mar 06 2026 Jie Xu <xujie@redhat.com> - 49.3-1
 - Rebase to 49.4
 - Enable snap plugin in main package with weak dependency on snapd
 
