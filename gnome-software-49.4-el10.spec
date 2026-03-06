@@ -16,22 +16,24 @@
 %bcond rpmostree %[!0%{?rhel}]
 # Disable DKMS/akmods support for RHEL builds
 %bcond dkms %[!0%{?rhel}]
+# Disable Snap plugin for RHEL builds
+%bcond snap %[!0%{?rhel}]
 
 # this is not a library version
-%define gs_plugin_version 21
+%define gs_plugin_version 23
 
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 %global __provides_exclude_from ^%{_libdir}/%{name}/plugins-%{gs_plugin_version}/.*\\.so.*$
 
 Name:      gnome-software
-Version:   47.5
+Version:   49.4
 Release:   1%{?dist}
 Summary:   A software center for GNOME
 
 License:   GPL-2.0-or-later
 URL:       https://apps.gnome.org/Software
-Source0:   https://download.gnome.org/sources/gnome-software/47/%{name}-%{tarball_version}.tar.xz
+Source0:   https://download.gnome.org/sources/gnome-software/49/%{name}-%{tarball_version}.tar.xz
 Source1:   org.gnome.App-list-1.0.xml
 
 Patch:     0001-Disable-build-and-use-of-help-files.patch
@@ -77,6 +79,9 @@ BuildRequires: pkgconfig(rpm)
 %if %{with rpmostree}
 BuildRequires: pkgconfig(rpm-ostree-1)
 %endif
+%if %{with snap}
+BuildRequires: pkgconfig(snapd-glib-2)
+%endif
 BuildRequires: pkgconfig(sysprof-capture-4)
 BuildRequires: pkgconfig(xmlb) >= %{libxmlb_version}
 
@@ -103,8 +108,13 @@ Requires: libxmlb%{?_isa} >= %{libxmlb_version}
 
 Recommends: PackageKit%{?_isa} >= %{packagekit_version}
 Recommends: %{name}-fedora-langpacks
+%if %{with snap}
+Recommends: snapd%{?_isa}
+Suggests: snapd%{?_isa}
+Provides: %{name}-snap = %{version}-%{release}
+Obsoletes: %{name}-snap < %{version}-%{release}
+%endif
 
-Obsoletes: gnome-software-snap < 3.33.1
 Obsoletes: gnome-software-editor < 3.35.1
 
 %description
@@ -147,7 +157,11 @@ This package includes the rpm-ostree backend.
 %build
 %meson \
     -Dsoup2=false \
+%if %{with snap}
+    -Dsnap=true \
+%else
     -Dsnap=false \
+%endif
 %if %{with malcontent}
     -Dmalcontent=true \
 %else
@@ -220,6 +234,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/applications/gnome-software-local-file-flatpak.desktop
 %{_datadir}/applications/gnome-software-local-file-fwupd.desktop
 %{_datadir}/applications/gnome-software-local-file-packagekit.desktop
+%if %{with snap}
+%{_datadir}/applications/gnome-software-local-file-snap.desktop
+%endif
 %{_datadir}/applications/org.gnome.Software.desktop
 %{_datadir}/bash-completion/completions/gnome-software
 %{_mandir}/man1/gnome-software.1*
@@ -240,6 +257,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %endif
 %{_datadir}/metainfo/org.gnome.Software.Plugin.Flatpak.metainfo.xml
 %{_datadir}/metainfo/org.gnome.Software.Plugin.Fwupd.metainfo.xml
+%if %{with snap}
+%{_datadir}/metainfo/org.gnome.Software.Plugin.Snap.metainfo.xml
+%endif
 %dir %{_libdir}/gnome-software/plugins-%{gs_plugin_version}
 %{_libdir}/gnome-software/libgnomesoftware.so.%{gs_plugin_version}
 %{_libdir}/gnome-software/plugins-%{gs_plugin_version}/libgs_plugin_appstream.so
@@ -261,6 +281,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_libdir}/gnome-software/plugins-%{gs_plugin_version}/libgs_plugin_provenance-license.so
 %{_libdir}/gnome-software/plugins-%{gs_plugin_version}/libgs_plugin_provenance.so
 %{_libdir}/gnome-software/plugins-%{gs_plugin_version}/libgs_plugin_repos.so
+%if %{with snap}
+%{_libdir}/gnome-software/plugins-%{gs_plugin_version}/libgs_plugin_snap.so
+%endif
 %{_sysconfdir}/xdg/autostart/org.gnome.Software.desktop
 %dir %{_datadir}/swcatalog
 %dir %{_datadir}/swcatalog/xml
@@ -302,6 +325,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_datadir}/gtk-doc/html/gnome-software/
 
 %changelog
+* Fri Mar 07 2026 Jie Xu <xujie@redhat.com> - 49.4-1
+- Rebase to 49.4
+- Enable snap plugin in main package with weak dependency on snapd
+
 * Mon Mar 24 2025 Milan Crha <mcrha@redhat.com> - 47.5-1
 - Resolves: RHEL-84652 (Update to 47.5)
 
@@ -1202,43 +1229,43 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Fri Apr 11 2014 Richard Hughes <rhughes@redhat.com> - 3.12.1-1
 - Update to 3.12.1
 
-* Mon Mar 24 2014 Richard Hughes <rhughes@redhat.com> - 3.12.0-1
+* Mon Mar 24 2014 Richard Hughes <rhughsie.com> - 3.12.0-1
 - Update to 3.12.0
 
-* Thu Mar 20 2014 Richard Hughes <rhughes@redhat.com> - 3.11.92-1
+* Thu Mar 20 2014 Richard Hughes <rhughsie.com> - 3.11.92-1
 - Update to 3.11.92
 
-* Tue Mar 18 2014 Richard Hughes <rhughes@redhat.com> - 3.11.91-2
+* Tue Mar 18 2014 Richard Hughes <rhughsie.com> - 3.11.91-2
 - Rebuild with new metadata.
 
-* Sat Mar 08 2014 Richard Hughes <rhughes@redhat.com> - 3.11.91-1
+* Sat Mar 08 2014 Richard Hughes <rhughsie.com> - 3.11.91-1
 - Update to 3.11.91
 
-* Tue Feb 18 2014 Richard Hughes <rhughes@redhat.com> - 3.11.90-1
+* Tue Feb 18 2014 Richard Hughes <rhughsie.com> - 3.11.90-1
 - Update to 3.11.90
 
-* Mon Feb 03 2014 Richard Hughes <rhughes@redhat.com> - 3.11.5-2
+* Mon Feb 03 2014 Richard Hughes <rhughsie.com> - 3.11.5-2
 - Require epiphany-runtime rather than the full application
 
-* Mon Feb 03 2014 Richard Hughes <rhughes@redhat.com> - 3.11.5-1
+* Mon Feb 03 2014 Richard Hughes <rhughsie.com> - 3.11.5-1
 - Update to 3.11.5
 
-* Thu Jan 30 2014 Richard Hughes <rhughes@redhat.com> - 3.11.4-3
+* Thu Jan 30 2014 Richard Hughes <rhughsie.com> - 3.11.4-3
 - Rebuild for libpackagekit-glib soname bump
 
-* Wed Jan 22 2014 Richard Hughes <rhughes@redhat.com> - 3.11.4-2
+* Wed Jan 22 2014 Richard Hughes <rhughsie.com> - 3.11.4-2
 - Rebuild with metadata that has the correct screenshot url.
 
-* Thu Jan 16 2014 Richard Hughes <rhughes@redhat.com> - 3.11.4-1
+* Thu Jan 16 2014 Richard Hughes <rhughsie.com> - 3.11.4-1
 - Update to 3.11.4
 
-* Tue Dec 17 2013 Richard Hughes <rhughes@redhat.com> - 3.11.3-1
+* Tue Dec 17 2013 Richard Hughes <rhughsie.com> - 3.11.3-1
 - Update to 3.11.3
 
-* Tue Nov 19 2013 Richard Hughes <rhughes@redhat.com> - 3.11.2-1
+* Tue Nov 19 2013 Richard Hughes <rhughsie.com> - 3.11.2-1
 - Update to 3.11.2
 
-* Tue Oct 29 2013 Richard Hughes <rhughes@redhat.com> - 3.11.1-1
+* Tue Oct 29 2013 Richard Hughes <rhughsie.com> - 3.11.1-1
 - Update to 3.11.1
 - Add a gnome shell search provider
 - Add a module to submit the user rating to the fedora-tagger web service
