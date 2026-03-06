@@ -16,8 +16,8 @@
 %bcond rpmostree %[!0%{?rhel}]
 # Disable DKMS/akmods support for RHEL builds
 %bcond dkms %[!0%{?rhel}]
-# Disable Snap plugin for RHEL builds
-%bcond snap %[!0%{?rhel}]
+# Enable Snap plugin by default
+%bcond_without snap
 
 # this is not a library version
 %define gs_plugin_version 23
@@ -499,7 +499,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Fri Jul 01 2022 Milan Crha <mcrha@redhat.com> - 43.alpha-1
 - Update to 43.alpha
 
-* Fri Jun 17 2022 Richard Hughes <rhughes@redhat.com> - 42.2-4
+* Fri Jun 17 2022 Richard Hughes <rhughsie@redhat.com> - 42.2-4
 - Add patch to make fwupd user requests work
 
 * Thu Jun 16 2022 David King <amigadave@amigadave.com> - 42.2-3
@@ -653,7 +653,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.36.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Fri May 22 2020 Richard Hughes <rhughes@redhat.com> - 3.36.1-1
+* Fri May 22 2020 Richard Hughes <rhughsie@redhat.com> - 3.36.1-1
 - Update to 3.36.1
 
 * Tue May 12 2020 Kalev Lember <klember@redhat.com> - 3.36.0-2
@@ -665,16 +665,16 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Wed Mar 04 2020 Kalev Lember <klember@redhat.com> - 3.35.92-1
 - Update to 3.35.92
 
-* Fri Feb 21 2020 Richard Hughes <rhughes@redhat.com> - 3.35.91-2
+* Fri Feb 21 2020 Richard Hughes <rhughsie@redhat.com> - 3.35.91-2
 - Backport a patch to fix a crash when looking at the application details.
 
-* Wed Feb 19 2020 Richard Hughes <rhughes@redhat.com> - 3.35.91-1
+* Wed Feb 19 2020 Richard Hughes <rhughsie@redhat.com> - 3.35.91-1
 - Update to 3.35.91.
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.35.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
-* Mon Nov 25 2019 Richard Hughes <rhughes@redhat.com> - 3.35.2-1
+* Mon Nov 25 2019 Richard Hughes <rhughsie@redhat.com> - 3.35.2-1
 - Update to 3.35.2.
 
 * Fri Oct 18 2019 Kalev Lember <klember@redhat.com> - 3.34.1-6
@@ -683,15 +683,15 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Mon Oct 14 2019 Kalev Lember <klember@redhat.com> - 3.34.1-5
 - Update renamed appstream ids for GNOME 3.34
 
-* Fri Oct 11 2019 Richard Hughes <rhughes@redhat.com> - 3.34.1-4
+* Fri Oct 11 2019 Richard Hughes <rhughsie@redhat.com> - 3.34.1-4
 - Backport a simpler to correct the installed applications
 - Resolves #1759193
 
-* Fri Oct 11 2019 Richard Hughes <rhughes@redhat.com> - 3.34.1-3
+* Fri Oct 11 2019 Richard Hughes <rhughsie@redhat.com> - 3.34.1-3
 - Backport a better patch to correct the installed applications
 - Resolves #1759193
 
-* Thu Oct 10 2019 Richard Hughes <rhughes@redhat.com> - 3.34.1-2
+* Thu Oct 10 2019 Richard Hughes <rhughsie@redhat.com> - 3.34.1-2
 - Backport a patch to correct the applications shown in the installed list
 - Resolves #1759193
 
@@ -710,7 +710,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Thu Jul 11 2019 Kalev Lember <klember@redhat.com> - 3.32.4-1
 - Update to 3.32.4
 
-* Thu Jul 11 2019 Richard Hughes <rhughes@redhat.com> - 3.32.3-5
+* Thu Jul 11 2019 Richard Hughes <rhughsie@redhat.com> - 3.32.3-5
 - Disable the snap plugin. Canonical upstream are not going to be installing
   gnome-software in the next LTS, prefering instead to ship a "Snap Store"
   rather than GNOME Software.
@@ -804,7 +804,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Thu Sep 06 2018 Kalev Lember <klember@redhat.com> - 3.30.0-1
 - Update to 3.30.0
 
-* Tue Aug 28 2018 Richard Hughes <rhughes@redhat.com> - 3.29.92-1
+* Tue Aug 28 2018 Richard Hughes <rhughsie@redhat.com> - 3.29.92-1
 - Update to 3.29.92
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.29.1-2
@@ -889,7 +889,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Tue Oct 10 2017 Kalev Lember <klember@redhat.com> - 3.26.1-3
 - Backport a flatpakref installation fix
 
-* Mon Oct 09 2017 Richard Hughes <rhughes@redhat.com> - 3.26.1-2
+* Mon Oct 09 2017 Richard Hughes <rhughsie@redhat.com> - 3.26.1-2
 - Disable fwupd support until we get a 3.27.1 tarball
 
 * Sun Oct 08 2017 Kalev Lember <klember@redhat.com> - 3.26.1-1
@@ -934,7 +934,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Tue Jun 27 2017 Neal Gompa <ngompa13@gmail.com> - 3.25.3-3
 - Ensure snap subpackage is installed if snapd is installed
 
-* Fri Jun 23 2017 Richard Hughes <rhughes@redhat.com> - 3.24.3-2
+* Fri Jun 23 2017 Richard Hughes <rhughsie@redhat.com> - 3.24.3-2
 - Enable the snap subpackage
 
 * Fri Jun 23 2017 Kalev Lember <klember@redhat.com> - 3.25.3-1
@@ -942,7 +942,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 - Switch to the meson build system
 - Add an -editor subpackage with new banner editor
 
-* Mon May 15 2017 Richard Hughes <rhughes@redhat.com> - 3.24.3-1
+* Mon May 15 2017 Richard Hughes <rhughsie@redhat.com> - 3.24.3-1
 - Update to 3.23.3
 - Fix a common crash when installing flatpakrepo files
 - Ensure we show the banner when upgrades are available
@@ -962,16 +962,16 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Thu Mar 16 2017 Kalev Lember <klember@redhat.com> - 3.23.92-1
 - Update to 3.23.92
 
-* Mon Feb 27 2017 Richard Hughes <rhughes@redhat.com> - 3.23.91-1
+* Mon Feb 27 2017 Richard Hughes <rhughsie@redhat.com> - 3.23.91-1
 - Update to 3.23.91
 
-* Mon Feb 13 2017 Richard Hughes <rhughes@redhat.com> - 3.23.90-1
+* Mon Feb 13 2017 Richard Hughes <rhughsie@redhat.com> - 3.23.90-1
 - Update to 3.23.90
 
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.23.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
-* Thu Dec 15 2016 Richard Hughes <rhughes@redhat.com> - 3.23.3-1
+* Thu Dec 15 2016 Richard Hughes <rhughsie@redhat.com> - 3.23.3-1
 - Update to 3.23.3
 
 * Wed Nov 23 2016 Kalev Lember <klember@redhat.com> - 3.23.2-1
@@ -1000,25 +1000,25 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 - Update to 3.21.90
 - Tighten -devel subpackage dependencies
 
-* Thu Jul 28 2016 Richard Hughes <rhughes@redhat.com> - 3.21.4-2
+* Thu Jul 28 2016 Richard Hughes <rhughsie@redhat.com> - 3.21.4-2
 - Allow building without PackageKit for the atomic workstation.
 
-* Mon Jul 18 2016 Richard Hughes <rhughes@redhat.com> - 3.21.4-1
+* Mon Jul 18 2016 Richard Hughes <rhughsie@redhat.com> - 3.21.4-1
 - Update to 3.21.4
 
 * Thu May 26 2016 Kalev Lember <klember@redhat.com> - 3.21.2-2
 - Build with flatpak support
 
-* Mon May 23 2016 Richard Hughes <rhughes@redhat.com> - 3.21.2-1
+* Mon May 23 2016 Richard Hughes <rhughsie@redhat.com> - 3.21.2-1
 - Update to 3.21.2
 
 * Tue May 10 2016 Kalev Lember <klember@redhat.com> - 3.21.1-2
 - Require PackageKit 1.1.1 for system upgrade support
 
-* Mon Apr 25 2016 Richard Hughes <rhughes@redhat.com> - 3.21.1-1
+* Mon Apr 25 2016 Richard Hughes <rhughsie@redhat.com> - 3.21.1-1
 - Update to 3.21.1
 
-* Mon Apr 25 2016 Richard Hughes <rhughes@redhat.com> - 3.20.2-1
+* Mon Apr 25 2016 Richard Hughes <rhughsie@redhat.com> - 3.20.2-1
 - Update to 3.20.1
 - Allow popular and featured apps to match any plugin
 - Do not make the ODRS plugin depend on xdg-app
@@ -1031,35 +1031,35 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Wed Apr 13 2016 Kalev Lember <klember@redhat.com> - 3.20.1-1
 - Update to 3.20.1
 
-* Fri Apr 01 2016 Richard Hughes <rhughes@redhat.com> - 3.20.1-2
+* Fri Apr 01 2016 Richard Hughes <rhughsie@redhat.com> - 3.20.1-2
 - Set the list of official sources
 - Compile with xdg-app support
 
 * Tue Mar 22 2016 Kalev Lember <klember@redhat.com> - 3.20.0-1
 - Update to 3.20.0
 
-* Mon Mar 14 2016 Richard Hughes <rhughes@redhat.com> - 3.19.92-1
+* Mon Mar 14 2016 Richard Hughes <rhughsie@redhat.com> - 3.19.92-1
 - Update to 3.19.92
 
 * Thu Mar 03 2016 Kalev Lember <klember@redhat.com> - 3.19.91-2
 - Set minimum required json-glib version
 
-* Mon Feb 29 2016 Richard Hughes <rhughes@redhat.com> - 3.19.91-1
+* Mon Feb 29 2016 Richard Hughes <rhughsie@redhat.com> - 3.19.91-1
 - Update to 3.19.91
 
-* Mon Feb 15 2016 Richard Hughes <rhughes@redhat.com> - 3.19.90-1
+* Mon Feb 15 2016 Richard Hughes <rhughsie@redhat.com> - 3.19.90-1
 - Update to 3.19.90
 
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.19.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
-* Fri Jan 15 2016 Richard Hughes <rhughes@redhat.com> - 3.19.4-1
+* Fri Jan 15 2016 Richard Hughes <rhughsie@redhat.com> - 3.19.4-1
 - Update to 3.19.4
 
 * Thu Dec 03 2015 Kalev Lember <klember@redhat.com> - 3.18.3-2
 - Require librsvg2 for the gdk-pixbuf svg loader
 
-* Thu Nov 05 2015 Richard Hughes <rhughes@redhat.com> - 3.18.3-1
+* Thu Nov 05 2015 Richard Hughes <rhughsie@redhat.com> - 3.18.3-1
 - Update to 3.18.3
 - Use the correct user agent string when downloading firmware
 - Fix a crash in the limba plugin
@@ -1083,10 +1083,10 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Tue Sep 15 2015 Kalev Lember <klember@redhat.com> - 3.17.92-2
 - Update dependency versions
 
-* Tue Sep 15 2015 Richard Hughes <rhughes@redhat.com> - 3.17.92-1
+* Tue Sep 15 2015 Richard Hughes <rhughsie@redhat.com> - 3.17.92-1
 - Update to 3.17.92
 
-* Thu Sep 10 2015 Richard Hughes <rhughes@redhat.com> - 3.17.91-2
+* Thu Sep 10 2015 Richard Hughes <rhughsie@redhat.com> - 3.17.91-2
 - Fix firmware updates
 
 * Thu Sep 03 2015 Kalev Lember <klember@redhat.com> - 3.17.91-1
@@ -1095,7 +1095,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Wed Aug 19 2015 Kalev Lember <klember@redhat.com> - 3.17.90-1
 - Update to 3.17.90
 
-* Wed Aug 12 2015 Richard Hughes <rhughes@redhat.com> - 3.17.3-1
+* Wed Aug 12 2015 Richard Hughes <rhughsie@redhat.com> - 3.17.3-1
 - Update to 3.17.3
 
 * Wed Jul 22 2015 David King <amigadave@amigadave.com> - 3.17.2-3
@@ -1136,19 +1136,19 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Thu Feb 19 2015 Kalev Lember <kalevlember@gmail.com> - 3.15.90-2
 - Backport a crash fix
 
-* Tue Feb 17 2015 Richard Hughes <rhughes@redhat.com> - 3.15.90-1
+* Tue Feb 17 2015 Richard Hughes <rhughsie@redhat.com> - 3.15.90-1
 - Update to 3.15.90
 
-* Mon Jan 19 2015 Richard Hughes <rhughes@redhat.com> - 3.15.4-1
+* Mon Jan 19 2015 Richard Hughes <rhughsie@redhat.com> - 3.15.4-1
 - Update to 3.15.4
 
 * Tue Nov 25 2014 Kalev Lember <kalevlember@gmail.com> - 3.15.2-1
 - Update to 3.15.2
 
-* Thu Nov 13 2014 Richard Hughes <rhughes@redhat.com> - 3.14.2-3
+* Thu Nov 13 2014 Richard Hughes <rhughsie@redhat.com> - 3.14.2-3
 - Fix non-Fedora build
 
-* Tue Nov 11 2014 Richard Hughes <rhughes@redhat.com> - 3.14.2-2
+* Tue Nov 11 2014 Richard Hughes <rhughsie@redhat.com> - 3.14.2-2
 - Backport a patch to fix compilation
 
 * Mon Nov 10 2014 Kalev Lember <kalevlember@gmail.com> - 3.14.2-1
@@ -1179,7 +1179,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Tue Sep 02 2014 Kalev Lember <kalevlember@gmail.com> - 3.13.91-1
 - Update to 3.13.91
 
-* Tue Aug 19 2014 Richard Hughes <rhughes@redhat.com> - 3.13.90-1
+* Tue Aug 19 2014 Richard Hughes <rhughsie@redhat.com> - 3.13.90-1
 - Update to 3.13.90
 
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.13.5-0.2.git5c89189
@@ -1198,14 +1198,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Wed Jun 25 2014 Kalev Lember <kalevlember@gmail.com> - 3.13.3-1
 - Update to 3.13.3
 
-* Thu Jun 12 2014 Richard Hughes <rhughes@redhat.com> - 3.13.3-0.2.git7491627
+* Thu Jun 12 2014 Richard Hughes <rhughsie@redhat.com> - 3.13.3-0.2.git7491627
 - Depend on the newly-created appstream-data package and stop shipping
   the metadata here.
 
 * Sat Jun 07 2014 Kalev Lember <kalevlember@gmail.com> - 3.13.3-0.1.git7491627
 - Update to 3.13.3 git snapshot
 
-* Wed May 28 2014 Richard Hughes <rhughes@redhat.com> - 3.13.2-2
+* Wed May 28 2014 Richard Hughes <rhughsie@redhat.com> - 3.13.2-2
 - Rebuild with new metadata.
 
 * Wed May 28 2014 Kalev Lember <kalevlember@gmail.com> - 3.13.2-1
@@ -1214,19 +1214,19 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 * Thu May 15 2014 Kalev Lember <kalevlember@gmail.com> - 3.13.1-4
 - Depend on gsettings-desktop-schemas
 
-* Mon May 12 2014 Richard Hughes <rhughes@redhat.com> - 3.13.1-3
+* Mon May 12 2014 Richard Hughes <rhughsie@redhat.com> - 3.13.1-3
 - Update the metadata and use appstream-util to install the metadata.
 
 * Wed May 07 2014 Kalev Lember <kalevlember@gmail.com> - 3.13.1-2
 - Drop gnome-icon-theme dependency
 
-* Mon Apr 28 2014 Richard Hughes <rhughes@redhat.com> - 3.13.1-1
+* Mon Apr 28 2014 Richard Hughes <rhughsie@redhat.com> - 3.13.1-1
 - Update to 3.13.1
 
 * Fri Apr 11 2014 Kalev Lember <kalevlember@gmail.com> - 3.12.1-2
 - Rebuild with new metadata.
 
-* Fri Apr 11 2014 Richard Hughes <rhughes@redhat.com> - 3.12.1-1
+* Fri Apr 11 2014 Richard Hughes <rhughsie@redhat.com> - 3.12.1-1
 - Update to 3.12.1
 
 * Mon Mar 24 2014 Richard Hughes <rhughsie.com> - 3.12.0-1
